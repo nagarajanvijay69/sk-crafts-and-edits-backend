@@ -10,7 +10,7 @@ app.use(express.json());
 
 
 app.use(cors({
-      origin : ['http://localhost:3000', 'https://sk-crafts-and-edits-frontend.vercel.app', 'https://sk-crafts-and-edits-admin.vercel.app/'],
+      origin : ['http://localhost:3000', 'https://sk-crafts-and-edits-frontend.vercel.app', 'https://sk-crafts-and-edits-admin.vercel.app'],
       methods : ['POST', 'PUT', 'DELETE', 'GET', 'PATCH']
 }));
 
