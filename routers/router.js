@@ -3,6 +3,7 @@ const productModel = require('../model/productModel');
 const categoryModel = require('../model/categoryModel');
 const upload = require('../images/multer');
 const cloudinary = require('../images/cloudinary');
+const messageModel = require('../model/messageModel');
 
 router.get('/ping', async (req, res) => {
   res.send('Server Running....');
@@ -27,26 +28,26 @@ router.post('/post-product', upload.array('images', 4), async (req, res) => {
 
       const product = new productModel({
         name: productData.name,
-        discription : productData.discription,
+        discription: productData.discription,
         category: productData.category,
         price: productData.price,
         offerPrice: productData.offerPrice,
         image: imageurl,
-        link : productData.link 
+        link: productData.link
       });
- 
+
       await product.save();
 
       const temp = await productModel.find();
       // console.log(temp);
-      
+
 
       return res.status(201).json({
         success: true,
         message: "Product uploaded successfully",
-        products : temp
+        products: temp
       });
-      
+
     } catch (e) {
       return res.status(500).json({
         success: false,
@@ -65,7 +66,6 @@ router.post('/post-product', upload.array('images', 4), async (req, res) => {
 router.post('/add-category', upload.single('image'), async (req, res) => {
 
   const categoryData = req.body;
-  // console.log("files ",req.file, "body ",req.body);
   const file = req.file;
 
   if (categoryData) {
@@ -89,7 +89,7 @@ router.post('/add-category', upload.single('image'), async (req, res) => {
       return res.status(201).json({
         success: true,
         message: "category created",
-        categories : temp
+        categories: temp
       });
     } catch (e) {
       res.status(500).json({
@@ -202,28 +202,49 @@ router.get('/get-product', async (req, res) => {
   }
 });
 
-let message = '';
 
 router.get('/get-message', async (req, res) => {
+
+  let message = await messageModel.find();
+  message = message[0];
+
   res.status(200).json({
     success: true,
-    message: message
+    message: message.message
   })
 });
 
 
 router.post('/set-message', async (req, res) => {
   const { messageInput } = req.body;
-  message = messageInput;
-  res.status(200).json({
-    success: true,
-    message: message
-  });
+
+  const messageArray = await messageModel.find();
+
+  try {
+
+    if (!messageArray[0]) {
+      new messageModel.create({
+        message: messageArray
+      });
+    } else {
+      const id = messageArray[0]._id;
+      await messageModel.findByIdAndUpdate(id, { message: messageInput },);
+    }
+
+    res.status(200).json({
+      success: true
+    });
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      message: e.message
+    })
+  }
 });
 
 
 router.post('/check-admin', async (req, res) => {
-  const { name ,email, password } = req.body;
+  const { name, email, password } = req.body;
   if (name === 'sk' && email === 'sk@gmail.com' && password === 'sk') {
     return res.status(200).json({
       success: true,
