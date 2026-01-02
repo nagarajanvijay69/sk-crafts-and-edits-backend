@@ -206,7 +206,7 @@ router.get('/get-product', async (req, res) => {
 router.get('/get-message', async (req, res) => {
 
   let message = await messageModel.find();
-  message = message[0];
+  message = message[0] ? message[0] : "" ;
 
   res.status(200).json({
     success: true,
